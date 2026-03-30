@@ -1,64 +1,77 @@
-# FastAPI 学习项目 - 图书管理系统
+# FastAPI 学习项目 - 图书管理系统 README
 
 专为 FastAPI 入门打造的完整学习项目，覆盖路由分发、接口文档、数据库集成、模板渲染等核心知识点，工程化结构设计，代码全注释，极简业务逻辑，让你快速掌握 FastAPI 的核心用法。
 
 ## 功能特性
 
 - ✅ **路由分发与模块化开发**：按业务模块拆分接口，实现代码解耦
-- ✅ **自动生成交互式接口文档**：Swagger UI + ReDoc 双文档支持
-- ✅ **Request 对象全用法演示**：获取请求的所有信息
-- ✅ **静态文件挂载与访问**：支持 CSS、图片、JS 等静态资源
-- ✅ **Jinja2 模板渲染**：包含模板继承、变量渲染、循环等
-- ✅ **SQLite 数据库集成**：使用 SQLAlchemy 2.0 异步 ORM
-- ✅ **Pydantic 数据校验**：自动请求体校验与响应格式化
-- ✅ **依赖注入系统**：实现数据库会话等依赖的自动管理
-- ✅ **完整 CRUD 接口**：图书的增删改查全流程演示
+
+- ✅ **自动生成交互式接口文档**：Swagger UI + ReDoc 双文档支持，无需额外编写
+
+- ✅ **Request 对象全用法演示**：获取请求的所有信息（请求头、IP、查询参数等）
+
+- ✅**静态文件挂载与访问**：支持 CSS、图片、JS 等静态资源
+
+- ✅ **Jinja2 模板渲染**：包含模板继承、变量渲染、循环等服务端渲染能力
+
+- ✅ **SQLite 数据库集成**：使用 SQLAlchemy 2.0 异步 ORM，无需额外安装数据库服务
+
+- ✅ **Pydantic 数据校验**：自动请求体校验与响应格式化，减少重复代码
+
+- ✅ **依赖注入系统**：实现数据库会话等依赖的自动管理，代码更简洁
+
+- ✅ **完整 CRUD 接口**：图书的增删改查全流程演示，贴合实际开发场景
 
 ## 技术栈
 
 - **Web 框架**：FastAPI
+
 - **数据库**：SQLite（文件型数据库，无需额外安装）
+
 - **ORM**：SQLAlchemy 2.0（异步）
+
 - **模板引擎**：Jinja2
+
 - **ASGI 服务器**：Uvicorn
+
 - **包管理工具**：uv
 
 ## 项目结构
 
-```
+```plain text
 fastapi_learn_project/
 ├── app/                          # 项目核心代码包
 │   ├── __init__.py
-│   ├── main.py                   # 项目入口
+│   ├── main.py                   # 项目入口（创建APP、注册路由/静态文件/模板）
 │   ├── core/                     # 全局配置
 │   │   ├── __init__.py
-│   │   └── config.py             # 项目常量与配置
+│   │   └── config.py             # 项目常量与配置（数据库地址、路径等）
 │   ├── database/                 # 数据库相关
 │   │   ├── __init__.py
-│   │   └── db.py                 # 数据库连接与会话管理
-│   ├── models/                   # ORM 模型
+│   │   └── db.py                 # 数据库连接、会话管理、依赖注入
+│   ├── models/                   # ORM 模型（数据库表结构）
 │   │   ├── __init__.py
 │   │   └── book.py               # 图书表模型
-│   ├── schemas/                  # Pydantic 模型
+│   ├── schemas/                  # Pydantic 模型（请求/响应校验）
 │   │   ├── __init__.py
-│   │   └── book.py               # 图书数据模型
+│   │   └── book.py               # 图书数据校验与响应格式化
 │   ├── api/                      # 路由分发
 │   │   ├── __init__.py
-│   │   ├── api_v1.py             # 路由汇总注册
-│   │   └── endpoints/            # 业务接口
+│   │   ├── api_v1.py             # 路由汇总注册（接口版本管理）
+│   │   └── endpoints/            # 业务接口实现
 │   │       ├── __init__.py
 │   │       ├── book.py           # 图书 CRUD 接口
-│   │       └── common.py         # 通用接口
-│   ├── templates/                # Jinja2 模板
-│   │   ├── base.html             # 基础模板
-│   │   ├── index.html            # 首页
+│   │       └── common.py         # 通用接口（Request对象演示）
+│   ├── templates/                # Jinja2 模板文件
+│   │   ├── base.html             # 基础模板（继承复用）
+│   │   ├── index.html            # 项目首页
 │   │   └── book_list.html        # 图书列表页
-│   └── static/                   # 静态文件
+│   └── static/                   # 静态文件（CSS、图片等）
 │       └── css/
-│           └── style.css         # 页面样式
-├── .gitignore
-├── pyproject.toml                # uv 项目配置文件
-└── README.md                     # 项目说明文档
+│           └── style.css         # 页面样式文件
+├── .gitignore                    # Git 忽略文件（缓存、虚拟环境等）
+├── pyproject.toml                # uv 包管理配置文件（依赖清单）
+└── README.md                     # 项目说明文档（当前文件）
 ```
 
 ## 快速开始
@@ -66,92 +79,245 @@ fastapi_learn_project/
 ### 前置要求
 
 - Python 3.8+
-- uv 包管理工具（如果未安装，可通过以下命令安装）：
-  ```bash
-  # Windows (PowerShell)
-  powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
-  
-  # Mac/Linux
-  curl -LsSf https://astral.sh/uv/install.sh | sh
-  ```
+
+- uv 包管理工具（未安装则执行以下命令）：
+        
+
+    - Windows (PowerShell)：`powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"`
+
+    - Mac/Linux：`curl -LsSf https://astral.sh/uv/install.sh | sh`
 
 ### 安装与运行
 
-1. **克隆/下载项目**
-   ```bash
-   cd fastapi_learn_project
-   ```
+1. 克隆/下载项目，进入项目根目录：
+        `cd fastapi_learn_project`
 
-2. **创建虚拟环境并安装依赖**
-   ```bash
-   # uv 会自动创建虚拟环境并安装 pyproject.toml 中的依赖
-   uv sync
-   ```
+2. 创建虚拟环境并安装依赖（uv 自动处理）：
+       `uv sync`
 
-3. **启动开发服务器**
-   ```bash
-   # 使用 uv 运行 uvicorn
-   uv run uvicorn app.main:app --reload
-   ```
+3. 启动开发服务器（代码修改自动重启）：`uv run uvicorn app.main:app --reload`
 
-4. **访问项目**
-   启动成功后，在浏览器中访问以下地址：
-   - 项目首页：http://127.0.0.1:8000
-   - 交互式接口文档：http://127.0.0.1:8000/docs
-   - ReDoc 规范文档：http://127.0.0.1:8000/redoc
-   - 图书列表页：http://127.0.0.1:8000/book-list
+4. 访问项目（启动成功后，浏览器打开以下地址）：
+        
 
-## 使用指南
+    - 项目首页：`http://127.0.0.1:8000`
 
-### 1. 接口调试
-访问 `http://127.0.0.1:8000/docs`，在 Swagger UI 中可以直接调试所有接口：
-- 点击任意接口展开详情
-- 点击「Try it out」
-- 填写参数后点击「Execute」发送请求
-- 查看响应结果
+    - 交互式接口文档（核心！用于调试接口）：`http://127.0.0.1:8000/docs`
 
-### 2. 学习顺序建议
-1. 先启动项目，访问首页和接口文档，熟悉整体功能
-2. 从 `app/main.py` 开始，理解项目入口和全局配置
-3. 学习 `app/api/endpoints/` 下的接口，掌握路由和 CRUD 操作
-4. 研究 `app/schemas/` 和 `app/models/`，理解 Pydantic 和 ORM 模型
-5. 查看 `app/database/db.py`，掌握数据库连接和依赖注入
-6. 最后了解模板渲染和静态文件的使用
+    - ReDoc 规范文档（正式接口说明）：`http://127.0.0.1:8000/redoc`
 
-## uv 常用命令
+    - 图书列表页（模板+数据库演示）：`http://127.0.0.1:8000/book-list`
+
+## 核心功能使用说明
+
+### 一、接口文档（Swagger UI）详细使用指南（重点！）
+
+项目启动后，访问 `http://127.0.0.1:8000/docs`，即可进入交互式接口文档，无需安装 Postman，直接调试所有接口，步骤如下：
+
+#### 1. 文档整体介绍
+
+- 顶部：项目名称、版本、描述（与 `main.py` 中配置一致）
+
+- 中间：按模块分组的接口（**图书管理接口**、**通用接口-核心特性演示**）
+
+- 底部：可下载接口规范（JSON/YAML 格式）
+
+#### 2. 通用操作步骤（所有接口都适用）
+
+1. 展开接口：点击任意接口（如 `POST /api/v1/books/`），即可查看接口详情（请求方法、路径、参数、响应格式）。
+
+2. 调试接口：点击接口右侧的 **Try it out** 按钮（变成蓝色），进入调试模式。
+
+3. 填写参数：根据接口要求，填写请求参数（路径参数、请求体等）。
+
+4. 发送请求：点击 **Execute** 按钮，发送请求并查看响应结果（状态码、响应数据）。
+
+5. 重置参数：点击 **Reset** 按钮，清空已填写的参数，重新调试。
+
+#### 3. 各接口详细调试说明（重点！）
+
+所有接口均以 `/api/v1` 为前缀，以下按模块详细说明，复制示例参数即可直接调试。
+
+##### （1）图书管理接口（核心 CRUD 接口）
+
+- **接口1：查询所有图书**
+
+    - 接口路径：`GET /api/v1/books/`
+
+    - 功能：查询数据库中所有图书，返回图书列表。
+
+    - 调试步骤：
+                1. 点击 **Try it out**（无需填写任何参数）；
+                2. 点击 **Execute**；
+                3. 响应结果：返回所有图书的 JSON 数组（无图书则返回空数组）。
+
+- **接口2：根据 ID 查询单本图书**
+
+    - 接口路径：`GET /api/v1/books/{book_id}`
+
+    - 功能：根据图书 ID，查询单本图书的详细信息。
+
+    - 调试步骤：
+                1. 点击 **Try it out**；
+                2. 在 `book_id` 输入框中填写图书 ID（如 1，需先新增图书）；
+                3. 点击 **Execute**；
+                4. 响应结果：成功（200）返回单本图书信息；失败（404）提示“ID 为 xx 的图书不存在”。
+              
+
+- **接口3：新增图书（重点调试）**
+
+    - 接口路径：`POST /api/v1/books/`
+
+    - 功能：新增一本图书，自动校验请求参数，避免重复书名。
+
+    - 调试步骤：
+                1. 点击 **Try it out**；
+                2. 在 **Request body** 输入框中，复制以下 JSON 示例（可修改字段）：
+                  `{
+      "title": "Python快速入门",
+      "author": "张三",
+      "price": 59.9,
+      "description": "适合零基础学习Python，简单易懂"
+    }`
+                3. 点击 **Execute**；
+                4. 响应结果：
+                   - 成功（201）：返回新增的图书信息（自动带上数据库生成的 ID）；
+                   - 失败（400）：提示“图书《xxx》已存在”（书名重复）；
+                   - 失败（422）：提示参数错误（如 price 小于 0、title 为空）。
+              
+
+    - 参数说明：
+                
+
+        - `title`：必填，字符串（1-100个字符），不可重复；
+
+        - `author`：必填，字符串（1-50个字符）；
+
+        - `price`：必填，数字（必须大于 0）；
+
+        - `description`：可选，字符串（可留空）。
+
+- **接口4：更新图书**
+
+    - 接口路径：`PUT /api/v1/books/{book_id}`
+
+    - 功能：根据图书 ID，更新图书信息（支持部分字段更新）。
+
+    - 调试步骤：
+                1. 点击 **Try it out**；
+                2. 填写 `book_id`（如 1，需先存在该图书）；
+                3. 在 **Request body** 输入框中，复制以下 JSON 示例（可只传需要修改的字段）：
+                  `{
+      "price": 69.9,
+      "description": "更新后的简介，适合零基础入门"
+    }`
+                4. 点击 **Execute**；
+                5. 响应结果：成功（200）返回更新后的图书信息；失败（404）提示图书不存在。
+              
+
+- **接口5：删除图书**
+
+    - 接口路径：`DELETE /api/v1/books/{book_id}`
+
+    - 功能：根据图书 ID，删除对应的图书。
+
+    - 调试步骤：
+                1. 点击 **Try it out**；
+                2. 填写 `book_id`（如 1，需先存在该图书）；
+                3. 点击 **Execute**；
+                4. 响应结果：成功（204）无返回内容；失败（404）提示图书不存在。
+              
+
+##### （2）通用接口（Request 对象演示）
+
+- 接口路径：`GET /api/v1/common/request-info`
+
+- 功能：演示 FastAPI 中 Request 对象的用法，返回当前请求的所有信息（请求方法、IP、请求头、Cookies 等）。
+
+- 调试步骤：
+        1. 点击 **Try it out**（无需填写参数）；
+        2. 点击 **Execute**；
+        3. 响应结果：返回当前请求的详细信息（可用于学习 Request 对象的使用）。
+      
+
+#### 4. 接口文档常见问题
+
+- Q：点击 Execute 后，提示“422 Unprocessable Entity”？
+       
+ A：请求参数不符合校验规则（如 price ≤ 0、title 为空），查看响应中的 `detail` 字段，修改参数后重新尝试。
+      
+
+- Q：查询/更新/删除图书时，提示“404 Not Found”？
+        
+ A：图书 ID 不存在，先通过“新增图书”接口创建图书，再使用对应的 ID 操作。
+      
+
+- Q：新增图书时，提示“400 Bad Request”？
+        
+ A：书名重复，修改 `title` 字段，使用不重复的书名即可。
+      
+
+### 二、页面访问说明
+
+- 项目首页（`http://127.0.0.1:8000`）：展示项目核心知识点，可点击导航栏跳转至其他页面。
+
+- 图书列表页（`http://127.0.0.1:8000/book-list`）：从数据库查询所有图书，渲染到页面中（需先通过接口新增图书，否则显示“暂无图书数据”）。
+
+### 三、uv 常用命令（包管理）
 
 ```bash
-# 安装依赖
+# 安装依赖（如新增包）
 uv add <package_name>
 
-# 安装开发依赖
+# 安装开发依赖（如调试工具）
 uv add --dev <package_name>
 
 # 移除依赖
 uv remove <package_name>
 
-# 同步依赖（安装 pyproject.toml 中的所有依赖）
+# 同步依赖（安装 pyproject.toml 中的所有依赖，首次启动必执行）
 uv sync
 
 # 运行 Python 脚本
 uv run python <script.py>
 
-# 运行项目命令
+# 启动项目（开发模式，自动重启）
 uv run uvicorn app.main:app --reload
 
 # 查看已安装的依赖
 uv pip list
 ```
 
+## 学习顺序建议
+
+1. 先启动项目，访问首页和接口文档，熟悉项目整体功能。
+
+2. 重点调试接口文档中的所有接口，掌握 CRUD 操作（新增 → 查询 → 更新 → 删除）。
+
+3. 阅读 `app/main.py`，理解项目入口、路由注册、静态文件和模板的配置。
+
+4. 学习 `app/api/endpoints/` 下的接口代码，掌握路由、依赖注入的用法。
+
+5. 研究 `app/schemas/` 和 `app/models/`，理解 Pydantic 数据校验和 ORM 模型。
+
+6. 查看 `app/database/db.py`，掌握数据库连接、会话管理和依赖注入的核心逻辑。
+
+7. 尝试修改代码（如新增字段、新增接口），加深对 FastAPI 的理解。
+
 ## 学习路线
 
-1. **路由与请求处理**：学习路径参数、查询参数、请求体
-2. **数据校验**：掌握 Pydantic 模型的使用
-3. **数据库操作**：学习 SQLAlchemy ORM 的异步 CRUD
-4. **依赖注入**：理解 FastAPI 的依赖系统
-5. **模板渲染**：掌握 Jinja2 模板的使用
-6. **接口文档**：利用自动生成的文档辅助开发
+1. 路由与请求处理：学习路径参数、查询参数、请求体的使用。
+
+2. 数据校验：掌握 Pydantic 模型的定义和校验规则。
+
+3. 数据库操作：学习 SQLAlchemy ORM 的异步 CRUD 操作。
+
+4. 依赖注入：理解 FastAPI 依赖系统的用法，实现代码复用。
+
+5. 模板渲染：掌握 Jinja2 模板的继承、变量渲染等用法。
+
+6. 接口文档：利用自动生成的文档辅助开发和调试。
 
 ## 贡献
 
-欢迎提交 Issue 和 Pull Request！
+欢迎提交 Issue 和 Pull Request，一起完善这个 FastAPI 学习项目！
