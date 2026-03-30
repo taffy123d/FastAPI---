@@ -1,6 +1,6 @@
 # FastAPI 学习项目 - 图书管理系统 README
 
-专为 FastAPI 入门打造的完整学习项目，覆盖路由分发、接口文档、数据库集成、模板渲染等核心知识点，工程化结构设计，代码全注释，极简业务逻辑，让你快速掌握 FastAPI 的核心用法。
+大学生自学 FastAPI 入门打造的完整学习项目，覆盖路由分发、接口文档、数据库集成、模板渲染等核心知识点，工程化结构设计，代码全注释，极简业务逻辑，让你快速掌握 FastAPI 的核心用法。
 
 ## 功能特性
 
@@ -89,8 +89,10 @@ fastapi_learn_project/
 
 ### 安装与运行
 
-1. 克隆/下载项目，进入项目根目录：
-        `cd fastapi_learn_project`
+1. **克隆/下载项目**
+   ```bash
+   git clone https://github.com/taffy123d/FastAPI---  
+   ```
 
 2. 创建虚拟环境并安装依赖（uv 自动处理）：
        `uv sync`
@@ -320,4 +322,4 @@ uv pip list
 
 ## 贡献
 
-欢迎提交 Issue 和 Pull Request，一起完善这个 FastAPI 学习项目！
+欢迎提交 Issue 和 Pull Request！
