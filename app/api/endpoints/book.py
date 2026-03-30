@@ -22,15 +22,36 @@ router = APIRouter(
 )
 
 # 1. 查询所有图书
-@router.get("/", response_model=list[BookResponse], summary="获取所有图书列表")
-async def get_all_books(db: AsyncSession = Depends(get_db)):
+# @router.get("/", response_model=list[BookResponse], summary="获取所有图书列表")
+# async def get_all_books(db: AsyncSession = Depends(get_db)):
+#     """
+#     查询数据库中所有的图书数据
+#     - 返回值：符合BookResponse模型的图书数组
+#     """
+#     # 执行异步查询
+#     result = await db.execute(select(Book))
+#     # 提取查询结果
+#     books = result.scalars().all()
+#     return books
+
+# 修改 app/api/endpoints/book.py 里的 get_all_books
+
+@router.get("/", response_model=list[BookResponse], summary="获取所有图书列表（支持搜索）")
+async def get_all_books(
+    keyword: str | None = None,  # 新增：搜索关键词
+    db: AsyncSession = Depends(get_db)
+):
     """
     查询数据库中所有的图书数据
-    - 返回值：符合BookResponse模型的图书数组
+    - keyword：可选，按书名模糊搜索
     """
-    # 执行异步查询
-    result = await db.execute(select(Book))
-    # 提取查询结果
+    query = select(Book)
+    
+    # 如果有搜索关键词，添加 where 条件
+    if keyword:
+        query = query.where(Book.title.contains(keyword))
+    
+    result = await db.execute(query)
     books = result.scalars().all()
     return books
 

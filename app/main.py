@@ -1,6 +1,10 @@
 """
 项目入口核心文件
 """
+
+from app.database.db import get_db
+from app.models.book import Book
+
 from fastapi import FastAPI, Request
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
@@ -70,23 +74,64 @@ async def index(request: Request):
     )
 
 # 7. 模板渲染接口：图书列表页（【关键修复】request 作为第一个参数）
+# 修改 main.py 里的 book_list_page
+
 @app.get("/book-list", response_class=HTMLResponse, summary="图书列表页-模板+数据库演示")
 async def book_list_page(
     request: Request,
+    keyword: str | None = None,  # 新增：接收搜索关键词
     db: AsyncSession = Depends(get_db)
 ):
     """
     演示模板渲染与数据库查询结合
+    支持按书名搜索
     """
-    # 查询所有图书
-    result = await db.execute(select(Book))
+    # 查询图书（支持搜索）
+    query = select(Book)
+    if keyword:
+        query = query.where(Book.title.contains(keyword))
+    
+    result = await db.execute(query)
     books = result.scalars().all()
 
-    # 【核心修复】TemplateResponse 的第一个参数必须是 request
     return templates.TemplateResponse(
-        request,  # 【关键】必须放在第一位
-        "book_list.html",
-        {
-            "books": books
+        request=request,
+        name="book_list.html",
+        context={
+            "books": books,
+            "keyword": keyword  # 传给模板，用于回填搜索框
+        }
+    )
+
+
+# 在 main.py 最后添加
+
+# 新增/编辑图书页面
+@app.get("/book-form", response_class=HTMLResponse, summary="图书表单页")
+# 新增/编辑图书页面
+@app.get("/book-form", response_class=HTMLResponse, summary="图书表单页")
+async def book_form_page(
+    request: Request,
+    book_id: int | None = None,
+    db: AsyncSession = Depends(get_db)  # 直接用依赖注入，不要自己写循环
+):
+    """
+    渲染图书表单页面
+    - 如果传了 book_id，就是编辑模式，会先查询图书数据
+    - 如果没传，就是新增模式
+    """
+    book = None
+    if book_id:
+        # 编辑模式：从数据库查这本书
+        result = await db.execute(select(Book).where(Book.id == book_id))
+        book = result.scalar_one_or_none()
+
+    # 【关键修复】TemplateResponse 第一个参数必须是 request
+    return templates.TemplateResponse(
+        request=request,  # 显式传入 request
+        name="book_form.html",
+        context={
+            "book": book,
+            "is_edit": book is not None
         }
     )

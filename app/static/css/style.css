@@ -173,3 +173,68 @@ body {
     text-align: center;
     margin-top: auto;
 }
+/* 在 style.css 最后添加 */
+
+/* 表单卡片 */
+.form-card {
+    background: white;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.form-card h2 {
+    color: #2563eb;
+    margin-bottom: 1.5rem;
+}
+
+.form-group {
+    margin-bottom: 1.25rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: #374151;
+}
+
+.form-group input,
+.form-group textarea {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 1rem;
+    transition: border-color 0.2s;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: #2563eb;
+}
+
+/* 图书卡片操作按钮 */
+.book-actions {
+    margin-top: 1rem;
+    display: flex;
+    gap: 0.75rem;
+}
+
+.small-btn {
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+}
+
+.danger-btn {
+    background-color: #dc2626;
+    color: white;
+    border: none;
+}
+
+.danger-btn:hover {
+    background-color: #b91c1c;
+}

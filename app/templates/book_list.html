@@ -1,15 +1,27 @@
-<!-- 图书列表页模板，继承基础模板 -->
 {% extends "base.html" %}
 
-<!-- 页面标题 -->
-{% block title %}图书列表 - FastAPI学习项目{% endblock %}
+{% block title %}图书列表{% endblock %}
 
-<!-- 页面主内容 -->
 {% block content %}
+
+<!-- 在 page-header 的 div 里，新增按钮旁边加搜索框 -->
+
 <div class="page-header">
-    <h2>图书列表</h2>
-    <p>从SQLite数据库中查询的所有图书数据</p>
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+        <div>
+            <h2>图书列表</h2>
+            <p>从SQLite数据库中查询的所有图书数据</p>
+        </div>
+        
+        <!-- 搜索框 + 新增按钮 -->
+        <div style="display: flex; gap: 0.75rem; align-items: center;">
+            <input type="text" id="searchInput" placeholder="输入书名搜索..." style="padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 6px;">
+            <button onclick="searchBooks()" class="btn secondary-btn">搜索</button>
+            <a href="/book-form" class="btn primary-btn">+ 新增图书</a>
+        </div>
+    </div>
 </div>
+
 
 {% if books %}
 <div class="book-grid">
@@ -23,13 +35,72 @@
         {% else %}
         <p class="book-desc">暂无简介</p>
         {% endif %}
+        
+        <!-- 操作按钮 -->
+        <div class="book-actions">
+            <a href="/book-form?book_id={{ book.id }}" class="btn small-btn">编辑</a>
+            <button onclick="deleteBook({{ book.id }})" class="btn small-btn danger-btn">删除</button>
+        </div>
     </div>
     {% endfor %}
 </div>
 {% else %}
 <div class="empty-card">
     <h3>暂无图书数据</h3>
-    <p>请先通过 <a href="/docs">接口文档</a> 创建图书数据</p>
+    <p>点击右上角“新增图书”添加第一本书吧！</p>
 </div>
 {% endif %}
+
+<script>
+    // 删除图书函数
+    async function deleteBook(bookId) {
+        if (!confirm('确定要删除这本书吗？')) {
+            return;
+        }
+
+        try {
+            const response = await fetch(`/api/v1/books/${bookId}`, {
+                method: 'DELETE'
+            });
+
+            if (response.ok) {
+                alert('删除成功！');
+                window.location.reload(); // 刷新页面
+            } else {
+                const error = await response.json();
+                alert('删除失败：' + (error.detail || '未知错误'));
+            }
+        } catch (err) {
+            console.error(err);
+            alert('网络错误，请稍后重试');
+        }
+    }
+
+    // 搜索图书函数
+function searchBooks() {
+    const keyword = document.getElementById('searchInput').value.trim();
+    // 刷新页面，带上搜索参数
+    if (keyword) {
+        window.location.href = `/book-list?keyword=${encodeURIComponent(keyword)}`;
+    } else {
+        window.location.href = '/book-list';
+    }
+}
+
+// 回车也能搜索
+document.getElementById('searchInput').addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') {
+        searchBooks();
+    }
+});
+
+// 页面加载时，如果有搜索关键词，填回输入框
+window.addEventListener('load', () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const keyword = urlParams.get('keyword');
+    if (keyword) {
+        document.getElementById('searchInput').value = keyword;
+    }
+});
+</script>
 {% endblock %}
