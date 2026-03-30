@@ -79,7 +79,7 @@ fastapi_learn_project/
 
 1. **克隆/下载项目**
    ```bash
-   cd fastapi_learn_project
+   git clone https://github.com/taffy123d/FastAPI---  
    ```
 
 2. **创建虚拟环境并安装依赖**
