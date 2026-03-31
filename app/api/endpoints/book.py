@@ -18,12 +18,12 @@ from app.models.book import Book
 # 导入Pydantic模型
 from app.schemas.book import BookCreate, BookUpdate, BookResponse
 
-
 from app.utils.file_scanner import (
     get_all_pdf_files,
-    get_pdf_path,
     BOOK_PDF_DIR,
-    pdf_exists
+    pdf_exists,
+    delete_pdf_file,  # 新增
+    rename_pdf_file   # 新增
 )
 
 # 创建子路由实例
@@ -110,67 +110,71 @@ async def create_book(
     return new_book
 
 # 4. 更新图书信息
-@router.put("/{book_id}", response_model=BookResponse, summary="更新图书信息")
+@router.put("/{book_id}", response_model=BookResponse)
 async def update_book(
     book_id: int,
-    book_data: BookUpdate,  # 更新的请求体，所有字段可选
+    book_data: BookUpdate,
     db: AsyncSession = Depends(get_db)
 ):
-    """
-    根据ID更新图书信息，支持部分更新
-    - book_id：要更新的图书ID
-    - book_data：仅传入需要修改的字段即可
-    - 404错误：图书不存在时返回
-    """
-    # 查询要更新的图书
     result = await db.execute(select(Book).where(Book.id == book_id))
     book = result.scalar_one_or_none()
 
     if not book:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"ID为{book_id}的图书不存在"
+            detail="图书不存在"
         )
 
-    # 仅更新传入的字段
+    # 【新增】处理 PDF 文件名变更
+    old_filename = book.filename
+    new_filename = book_data.filename
+    
+    if old_filename != new_filename:
+        # 如果传了新文件名，检查文件是否存在
+        if new_filename and not pdf_exists(new_filename):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"PDF 文件 {new_filename} 不存在"
+            )
+        
+        # 如果只是想“取消关联”，不删除文件
+        # 如果是“换一个文件”，也不删除旧文件（防止误删）
+        # 如果你想“改文件名”，可以在前端加一个单独的“重命名文件”功能
+        # 这里我们只做数据库字段更新，不自动重命名物理文件（防止逻辑混乱）
+        pass
+
+    # 更新字段
     update_data = book_data.model_dump(exclude_unset=True)
     for key, value in update_data.items():
         setattr(book, key, value)
 
-    # 提交事务
     await db.commit()
-    # 刷新对象
     await db.refresh(book)
-
     return book
 
 # 5. 删除图书
-@router.delete("/{book_id}", status_code=status.HTTP_204_NO_CONTENT, summary="删除图书")
+@router.delete("/{book_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_book(
     book_id: int,
     db: AsyncSession = Depends(get_db)
 ):
-    """
-    根据ID删除图书
-    - book_id：要删除的图书ID
-    - 404错误：图书不存在时返回
-    - 204状态码：删除成功返回（无内容标准状态码）
-    """
-    # 查询要删除的图书
     result = await db.execute(select(Book).where(Book.id == book_id))
     book = result.scalar_one_or_none()
 
     if not book:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"ID为{book_id}的图书不存在"
+            detail="图书不存在"
         )
-
-    # 删除图书
+    
+    # 【新增】如果有关联 PDF，同时删除文件
+    if book.filename:
+        delete_pdf_file(book.filename)
+    
+    # 删除数据库记录
     await db.delete(book)
-    # 提交事务
     await db.commit()
-
+    
     return
 
 # 【新增】上传 PDF 文件
@@ -285,3 +289,41 @@ async def get_pdf_list():
     from app.utils.file_scanner import get_all_pdf_files
     pdf_files = get_all_pdf_files()
     return {"pdfs": pdf_files}
+
+
+# 【新增】重命名 PDF 文件
+@router.post("/rename-pdf", summary="重命名PDF文件")
+async def rename_pdf(
+    old_filename: str,
+    new_filename: str,
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    重命名 PDF 文件，同时更新数据库中所有关联的图书记录
+    """
+    # 1. 安全检查
+    if not old_filename or not new_filename:
+        raise HTTPException(400, "文件名不能为空")
+    
+    if not new_filename.lower().endswith(".pdf"):
+        raise HTTPException(400, "新文件名必须以 .pdf 结尾")
+    
+    # 2. 执行重命名
+    if not rename_pdf_file(old_filename, new_filename):
+        raise HTTPException(400, "重命名失败，请检查文件是否存在")
+    
+    # 3. 更新数据库中所有关联的图书
+    result = await db.execute(select(Book).where(Book.filename == old_filename))
+    books = result.scalars().all()
+    
+    for book in books:
+        book.filename = new_filename
+    
+    await db.commit()
+    
+    return {
+        "message": "重命名成功",
+        "old_filename": old_filename,
+        "new_filename": new_filename,
+        "updated_books": len(books)
+    }

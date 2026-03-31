@@ -104,34 +104,36 @@ async def book_list_page(
     )
 
 
-# 在 main.py 最后添加
-
-# 新增/编辑图书页面
-@app.get("/book-form", response_class=HTMLResponse, summary="图书表单页")
 # 新增/编辑图书页面
 @app.get("/book-form", response_class=HTMLResponse, summary="图书表单页")
 async def book_form_page(
     request: Request,
     book_id: int | None = None,
-    db: AsyncSession = Depends(get_db)  # 直接用依赖注入，不要自己写循环
+    db: AsyncSession = Depends(get_db)
 ):
-    """
-    渲染图书表单页面
-    - 如果传了 book_id，就是编辑模式，会先查询图书数据
-    - 如果没传，就是新增模式
-    """
     book = None
+    book_dict = None  # 用于传给模板的字典
+    
     if book_id:
-        # 编辑模式：从数据库查这本书
         result = await db.execute(select(Book).where(Book.id == book_id))
         book = result.scalar_one_or_none()
+        
+        if book:
+            # 【关键修复】把 ORM 对象转成字典
+            book_dict = {
+                "id": book.id,
+                "title": book.title,
+                "author": book.author,
+                "price": book.price,
+                "description": book.description,
+                "filename": book.filename
+            }
 
-    # 【关键修复】TemplateResponse 第一个参数必须是 request
     return templates.TemplateResponse(
-        request=request,  # 显式传入 request
+        request=request,
         name="book_form.html",
         context={
-            "book": book,
-            "is_edit": book is not None
+            "book": book_dict,  # 传字典，不传 ORM 对象
+            "is_edit": book_dict is not None
         }
     )
