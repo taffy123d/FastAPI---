@@ -20,3 +20,5 @@ env/
 .env.local
 
 *.pdf
+
+.book_cli/
